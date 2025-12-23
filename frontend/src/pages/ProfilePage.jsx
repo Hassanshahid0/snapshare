@@ -377,10 +377,28 @@ const ProfilePage = () => {
             <h3 className="font-semibold mb-3 dark:text-white">Stories</h3>
             <div className="flex gap-4 overflow-x-auto">
               {stories.map((story) => (
-                <div key={story._id} className="flex-shrink-0">
+                <div key={story._id} className="flex-shrink-0 relative">
                   <div className="w-20 h-20 rounded-full bg-gradient-to-r from-red-500 to-orange-500 p-0.5">
                     <img src={story.image} alt="" className="w-full h-full rounded-full object-cover border-2 border-white dark:border-slate-800" />
                   </div>
+                  {isOwnProfile && (
+                    <button
+                      onClick={async () => {
+                        if (window.confirm('Are you sure you want to delete this story?')) {
+                          try {
+                            await api.delete(`/stories/${story._id}`);
+                            fetchStories();
+                          } catch (err) {
+                            console.error('Error deleting story:', err);
+                            alert('Failed to delete story');
+                          }
+                        }
+                      }}
+                      className="absolute -top-1 -right-1 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600"
+                    >
+                      <i className="fas fa-times"></i>
+                    </button>
+                  )}
                 </div>
               ))}
             </div>

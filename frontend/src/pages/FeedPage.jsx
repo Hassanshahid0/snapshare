@@ -150,7 +150,7 @@ const FeedPage = () => {
                 <p className="text-slate-500 dark:text-slate-400">Follow some creators to see their posts!</p>
               </div>
             ) : (
-              posts.map(post => <PostCard key={post._id} post={post} onLike={handleLike} />)
+              posts.map(post => <PostCard key={post._id} post={post} onLike={handleLike} onDelete={(postId) => setPosts(posts.filter(p => p._id !== postId))} />)
             )}
           </div>
 

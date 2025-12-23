@@ -4,17 +4,20 @@ import { useAuth } from '../context/AuthContext';
 import ShareModal from './ShareModal';
 import api from '../api/axios';
 
-const PostCard = ({ post, onLike }) => {
+const PostCard = ({ post, onLike, onDelete }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [showComments, setShowComments] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
   const [commentText, setCommentText] = useState('');
   const [comments, setComments] = useState(post.comments || []);
   const [isLikeAnimating, setIsLikeAnimating] = useState(false);
   const [showDoubleTapHeart, setShowDoubleTapHeart] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const isLiked = post.likes?.includes(user?._id);
+  const isOwnPost = post.user?._id === user?._id;
   const lastTapRef = useRef(0);
 
   const handleLikeClick = () => {
@@ -57,6 +60,23 @@ const PostCard = ({ post, onLike }) => {
     }
   };
 
+  const handleDelete = async () => {
+    if (!window.confirm('Are you sure you want to delete this post?')) return;
+    
+    setIsDeleting(true);
+    try {
+      await api.delete(`/posts/${post._id}`);
+      if (onDelete) {
+        onDelete(post._id);
+      }
+    } catch (err) {
+      console.error('Delete error:', err);
+      alert('Failed to delete post');
+    }
+    setIsDeleting(false);
+    setShowMenu(false);
+  };
+
   return (
     <div className="card mb-4 overflow-hidden dark:bg-slate-800">
       <div className="flex items-center justify-between p-4">
@@ -71,6 +91,35 @@ const PostCard = ({ post, onLike }) => {
             </p>
           </div>
         </div>
+        
+        {/* Delete Menu for Own Posts */}
+        {isOwnPost && (
+          <div className="relative">
+            <button 
+              onClick={() => setShowMenu(!showMenu)}
+              className="text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-2"
+            >
+              <i className="fas fa-ellipsis-v"></i>
+            </button>
+            
+            {showMenu && (
+              <div className="absolute right-0 top-full mt-1 bg-white dark:bg-slate-700 rounded-xl shadow-lg border border-slate-200 dark:border-slate-600 overflow-hidden z-10">
+                <button
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                  className="flex items-center gap-2 px-4 py-3 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 w-full text-left"
+                >
+                  {isDeleting ? (
+                    <i className="fas fa-spinner fa-spin"></i>
+                  ) : (
+                    <i className="fas fa-trash"></i>
+                  )}
+                  <span>Delete Post</span>
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       <div 
