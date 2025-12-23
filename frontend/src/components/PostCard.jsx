@@ -78,43 +78,47 @@ const PostCard = ({ post, onLike, onDelete }) => {
   };
 
   return (
-    <div className="card mb-4 overflow-hidden dark:bg-slate-800">
+    <div className="card mb-6 overflow-hidden dark:bg-zinc-900 hover:shadow-xl transition-all duration-300">
+      {/* Header */}
       <div className="flex items-center justify-between p-4">
-        <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate(`/profile/${post.user?._id}`)}>
-          <div className="avatar-ring p-0.5">
-            <img src={post.user?.avatar} alt="" className="w-10 h-10 rounded-full object-cover border-2 border-white dark:border-slate-800" />
+        <div className="flex items-center gap-3 cursor-pointer group" onClick={() => navigate(`/profile/${post.user?._id}`)}>
+          <div className="relative">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-red-500 to-orange-500 p-0.5">
+              <img src={post.user?.avatar} alt="" className="w-full h-full rounded-full object-cover border-2 border-white dark:border-zinc-900" />
+            </div>
+            <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white dark:border-zinc-900"></div>
           </div>
           <div>
-            <span className="font-semibold dark:text-white">{post.user?.username}</span>
+            <span className="font-bold dark:text-white group-hover:text-red-500 transition-colors">{post.user?.username}</span>
             <p className={`text-xs px-2 py-0.5 rounded-full inline-block ml-2 ${post.user?.role === 'creator' ? 'badge-creator' : 'badge-consumer'}`}>
               {post.user?.role}
             </p>
           </div>
         </div>
         
-        {/* Delete Menu for Own Posts */}
+        {/* Delete Menu */}
         {isOwnPost && (
           <div className="relative">
             <button 
               onClick={() => setShowMenu(!showMenu)}
-              className="text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-2"
+              className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
             >
-              <i className="fas fa-ellipsis-v"></i>
+              <i className="fas fa-ellipsis-h text-zinc-500"></i>
             </button>
             
             {showMenu && (
-              <div className="absolute right-0 top-full mt-1 bg-white dark:bg-slate-700 rounded-xl shadow-lg border border-slate-200 dark:border-slate-600 overflow-hidden z-10">
+              <div className="absolute right-0 top-full mt-2 bg-white dark:bg-zinc-800 rounded-2xl shadow-2xl border border-zinc-200 dark:border-zinc-700 overflow-hidden z-10 min-w-[160px] animate-scale-in">
                 <button
                   onClick={handleDelete}
                   disabled={isDeleting}
-                  className="flex items-center gap-2 px-4 py-3 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 w-full text-left"
+                  className="flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 w-full text-left transition-colors"
                 >
                   {isDeleting ? (
                     <i className="fas fa-spinner fa-spin"></i>
                   ) : (
                     <i className="fas fa-trash"></i>
                   )}
-                  <span>Delete Post</span>
+                  <span className="font-medium">Delete Post</span>
                 </button>
               </div>
             )}
@@ -122,8 +126,9 @@ const PostCard = ({ post, onLike, onDelete }) => {
         )}
       </div>
 
+      {/* Image */}
       <div 
-        className="bg-black flex items-center justify-center relative cursor-pointer select-none"
+        className="bg-zinc-900 flex items-center justify-center relative cursor-pointer select-none img-zoom"
         onClick={handleDoubleTap}
         onDoubleClick={(e) => {
           e.preventDefault();
@@ -143,8 +148,8 @@ const PostCard = ({ post, onLike, onDelete }) => {
         />
         {showDoubleTapHeart && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <i className="fas fa-heart text-white text-8xl animate-like-pop" style={{
-              textShadow: '0 0 20px rgba(255,255,255,0.8)',
+            <i className="fas fa-heart text-white text-8xl" style={{
+              textShadow: '0 0 40px rgba(239, 68, 68, 0.8)',
               animation: 'doubleTapHeart 1s ease-out forwards'
             }}></i>
           </div>
@@ -153,68 +158,88 @@ const PostCard = ({ post, onLike, onDelete }) => {
 
       {showShareModal && <ShareModal post={post} onClose={() => setShowShareModal(false)} />}
 
+      {/* Actions */}
       <div className="p-4">
-        <div className="flex justify-between mb-3">
-          <div className="flex gap-4">
+        <div className="flex justify-between mb-4">
+          <div className="flex gap-2">
             <button 
               onClick={handleLikeClick} 
-              className={`text-2xl transition-all ${isLiked ? 'text-red-500' : 'text-slate-600 dark:text-slate-300 hover:text-red-500'} ${isLikeAnimating ? 'animate-like-pop' : ''}`}
+              className={`icon-btn ${isLiked ? 'text-red-500 bg-red-50 dark:bg-red-900/20' : 'text-zinc-600 dark:text-zinc-300'} ${isLikeAnimating ? 'animate-like-pop' : ''}`}
             >
-              <i className={`${isLiked ? 'fas' : 'far'} fa-heart`}></i>
+              <i className={`${isLiked ? 'fas' : 'far'} fa-heart text-xl`}></i>
             </button>
-            <button onClick={() => setShowComments(!showComments)} className="text-2xl text-slate-600 dark:text-slate-300 hover:text-indigo-500 transition-colors">
-              <i className="far fa-comment"></i>
+            <button onClick={() => setShowComments(!showComments)} className="icon-btn text-zinc-600 dark:text-zinc-300">
+              <i className="far fa-comment text-xl"></i>
             </button>
-            <button onClick={() => setShowShareModal(true)} className="text-2xl text-slate-600 dark:text-slate-300 hover:text-cyan-500 transition-colors">
-              <i className="far fa-paper-plane"></i>
+            <button onClick={() => setShowShareModal(true)} className="icon-btn text-zinc-600 dark:text-zinc-300">
+              <i className="far fa-paper-plane text-xl"></i>
             </button>
           </div>
           <button 
             onClick={handleSave}
-            className={`text-2xl transition-colors ${isSaved ? 'text-amber-500' : 'text-slate-600 dark:text-slate-300 hover:text-amber-500'}`}
+            className={`icon-btn ${isSaved ? 'text-amber-500 bg-amber-50 dark:bg-amber-900/20' : 'text-zinc-600 dark:text-zinc-300'}`}
           >
-            <i className={`${isSaved ? 'fas' : 'far'} fa-bookmark`}></i>
+            <i className={`${isSaved ? 'fas' : 'far'} fa-bookmark text-xl`}></i>
           </button>
         </div>
 
-        <p className="font-semibold mb-1 dark:text-white">{post.likes?.length || 0} likes</p>
-        <p className="text-slate-800 dark:text-slate-200">
-          <span className="font-semibold">{post.user?.username}</span> {post.caption}
+        {/* Likes */}
+        <p className="font-bold mb-2 dark:text-white">{post.likes?.length || 0} likes</p>
+        
+        {/* Caption */}
+        <p className="text-zinc-800 dark:text-zinc-200">
+          <span className="font-bold cursor-pointer hover:text-red-500 transition-colors" onClick={() => navigate(`/profile/${post.user?._id}`)}>{post.user?.username}</span>{' '}
+          {post.caption}
         </p>
         
+        {/* Comments Preview */}
         {comments.length > 0 && (
-          <button onClick={() => setShowComments(!showComments)} className="text-slate-500 dark:text-slate-400 text-sm mt-1 hover:text-indigo-500">
+          <button onClick={() => setShowComments(!showComments)} className="text-zinc-500 dark:text-zinc-400 text-sm mt-2 hover:text-red-500 transition-colors">
             View all {comments.length} comments
           </button>
         )}
 
-        <p className="text-slate-400 text-xs mt-2">{new Date(post.createdAt).toLocaleDateString()}</p>
+        {/* Date */}
+        <p className="text-zinc-400 text-xs mt-2 uppercase tracking-wide">{new Date(post.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
       </div>
 
+      {/* Comments Section */}
       {showComments && (
-        <div className="border-t border-slate-200 dark:border-slate-700 p-4">
-          <div className="max-h-48 overflow-y-auto mb-4">
+        <div className="border-t border-zinc-200 dark:border-zinc-800 p-4 bg-zinc-50 dark:bg-zinc-900/50">
+          <div className="max-h-60 overflow-y-auto mb-4 space-y-4">
             {comments.map((c, i) => (
-              <div key={i} className="flex gap-3 mb-3">
-                <img src={c.user?.avatar} alt="" className="w-8 h-8 rounded-full object-cover" />
-                <div>
-                  <p className="text-sm dark:text-slate-200">
-                    <span className="font-semibold">{c.user?.username}</span> {c.text}
+              <div key={i} className="flex gap-3 group">
+                <img 
+                  src={c.user?.avatar} 
+                  alt="" 
+                  className="w-9 h-9 rounded-full object-cover cursor-pointer hover:opacity-80 transition-opacity" 
+                  onClick={() => navigate(`/profile/${c.user?._id}`)}
+                />
+                <div className="flex-1">
+                  <p className="text-sm dark:text-zinc-200">
+                    <span className="font-bold cursor-pointer hover:text-red-500 transition-colors" onClick={() => navigate(`/profile/${c.user?._id}`)}>{c.user?.username}</span>{' '}
+                    {c.text}
                   </p>
-                  <p className="text-xs text-slate-400">{new Date(c.createdAt).toLocaleDateString()}</p>
+                  <p className="text-xs text-zinc-400 mt-1">{new Date(c.createdAt).toLocaleDateString()}</p>
                 </div>
               </div>
             ))}
           </div>
-          <form onSubmit={handleComment} className="flex gap-2">
+          <form onSubmit={handleComment} className="flex gap-3">
             <input 
               type="text" 
               placeholder="Add a comment..." 
               value={commentText} 
               onChange={(e) => setCommentText(e.target.value)} 
-              className="flex-1 input-modern px-4 py-2 text-sm focus:outline-none dark:text-white" 
+              className="flex-1 bg-white dark:bg-zinc-800 rounded-full px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 dark:text-white" 
             />
-            <button type="submit" className="text-indigo-500 font-semibold text-sm hover:text-indigo-600">Post</button>
+            <button 
+              type="submit" 
+              disabled={!commentText.trim()}
+              className="px-5 py-3 bg-red-500 hover:bg-red-600 disabled:opacity-50 disabled:hover:bg-red-500 text-white font-semibold text-sm rounded-full transition-colors"
+            >
+              Post
+            </button>
           </form>
         </div>
       )}
