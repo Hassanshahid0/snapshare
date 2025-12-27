@@ -14,6 +14,11 @@ exports.signup = async (req, res) => {
   try {
     const { username, email, password, role } = req.body;
 
+    // Validate required fields
+    if (!username || !email || !password || !role) {
+      return res.status(400).json({ error: 'All fields are required' });
+    }
+
     // Validate role
     if (!['creator', 'consumer'].includes(role)) {
       return res.status(400).json({ error: 'Invalid role. Must be creator or consumer' });
@@ -39,12 +44,16 @@ exports.signup = async (req, res) => {
 
     await user.save();
 
-    // Log activity
-    await Activity.create({
-      user: user._id,
-      type: 'signup',
-      details: `Signed up as ${role}`
-    });
+    // Log activity (don't fail if this fails)
+    try {
+      await Activity.create({
+        user: user._id,
+        type: 'signup',
+        details: `Signed up as ${role}`
+      });
+    } catch (actErr) {
+      console.log('Activity log error:', actErr);
+    }
 
     // Generate token
     const token = generateToken(user._id);
@@ -64,8 +73,8 @@ exports.signup = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Signup error:', error);
-    res.status(500).json({ error: 'Server error during signup' });
+    console.error('Signup error:', error.message);
+    res.status(500).json({ error: error.message || 'Server error during signup' });
   }
 };
 
@@ -75,6 +84,11 @@ exports.signup = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
+
+    // Validate required fields
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required' });
+    }
 
     // Find user
     const user = await User.findOne({ email });
@@ -88,11 +102,15 @@ exports.login = async (req, res) => {
       return res.status(400).json({ error: 'Invalid email or password' });
     }
 
-    // Log activity
-    await Activity.create({
-      user: user._id,
-      type: 'login'
-    });
+    // Log activity (don't fail if this fails)
+    try {
+      await Activity.create({
+        user: user._id,
+        type: 'login'
+      });
+    } catch (actErr) {
+      console.log('Activity log error:', actErr);
+    }
 
     // Generate token
     const token = generateToken(user._id);
@@ -112,8 +130,8 @@ exports.login = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({ error: 'Server error during login' });
+    console.error('Login error:', error.message);
+    res.status(500).json({ error: error.message || 'Server error during login' });
   }
 };
 
