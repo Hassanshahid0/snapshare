@@ -22,10 +22,24 @@ fi
 pm2 delete snapshare-backend 2>/dev/null
 pm2 delete snapshare-frontend 2>/dev/null
 
-# Start Backend on port 5000
-echo "Starting Backend with PM2..."
+# Create .env file if it doesn't exist
+echo "Setting up environment variables..."
+if [ ! -f backend/.env ]; then
+    echo "PORT=5000" > backend/.env
+    echo "JWT_SECRET=snapshare_jwt_secret_key_2024_very_secure" >> backend/.env
+    echo "MONGODB_URI=mongodb+srv://usmansaleem925_db_user:Usman123@snapshare.wighnkg.mongodb.net/?appName=SnapShare" >> backend/.env
+    echo "✅ backend/.env file created with production settings."
+else
+    echo "ℹ️ backend/.env file already exists."
+fi
+
+# Install Backend dependencies
+echo "Installing Backend dependencies..."
 cd backend
 npm install
+
+# Start Backend on port 5000
+echo "Starting Backend with PM2..."
 NODE_ENV=production pm2 start server.js --name snapshare-backend
 
 # Wait for backend to start and check health
