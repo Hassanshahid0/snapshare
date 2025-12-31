@@ -29,7 +29,7 @@ const corsOptions = {
   origin: function (origin, callback) {
     if (!origin) return callback(null, true); // allow Postman / server-to-server
 
-    if (origin.startsWith('http://localhost') || origin.startsWith('http://127.0.0.1')) {
+    if (origin.startsWith('http://localhost') || origin.startsWith('http://127.0.0.1') || origin.startsWith('http://4.251.118.253')) {
       return callback(null, true);
     }
 
@@ -131,8 +131,9 @@ mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
     console.log('Connected to MongoDB');
-    server.listen(PORT, () => {
+    server.listen(PORT, '0.0.0.0', () => {
       console.log(`Server running on port ${PORT}`);
+      console.log(`API accessible at http://4.251.118.253:${PORT}`);
     });
   })
   .catch((err) => {
