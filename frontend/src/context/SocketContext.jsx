@@ -14,7 +14,7 @@ export const SocketProvider = ({ children }) => {
   useEffect(() => {
     if (user) {
       // Connect to socket server
-      const newSocket = io('http://localhost:8000', {
+      const newSocket = io('http://4.251.118.253:5000', {
         transports: ['websocket', 'polling']
       });
 

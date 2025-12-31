@@ -23,7 +23,7 @@ const server = http.createServer(app);
 // Socket.IO setup
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: "http://4.251.118.253:5173",
     methods: ["GET", "POST"]
   }
 });
