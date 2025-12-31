@@ -22,14 +22,23 @@ fi
 pm2 delete snapshare-backend 2>/dev/null
 pm2 delete snapshare-frontend 2>/dev/null
 
-# Install Backend dependencies
-echo "Installing Backend dependencies..."
-cd backend
-npm install
-
 # Start Backend on port 5000
 echo "Starting Backend with PM2..."
+cd backend
+npm install
 NODE_ENV=production pm2 start server.js --name snapshare-backend
+
+# Wait for backend to start and check health
+echo "Waiting for backend to start..."
+sleep 5
+if curl -s http://localhost:5000/api/health | grep -q "ok"; then
+    echo "✅ Backend is healthy!"
+else
+    echo "❌ Backend health check failed! Checking logs..."
+    pm2 logs snapshare-backend --lines 20 --no-daemon &
+    sleep 5
+    kill $!
+fi
 
 # Install Frontend dependencies and Build
 echo "Installing Frontend dependencies and Building..."
